@@ -1,9 +1,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character
-local HRP = Character:WaitForChild("HumanoidRootPart")
 
 --Toggles
 local InfectAuraToggle = false
@@ -85,7 +82,7 @@ end
 function SwingAura()
     RunService.Heartbeat:Connect(function(deltaTime)
         if SwingAuraToggle == false then return end
-        local Weapon = Character:FindFirstChildOfClass("Tool")
+        local Weapon = Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
 
         if not Weapon then return end
         local SwingEvent = Weapon.SwingEvent
@@ -187,7 +184,7 @@ end
 function FindKey()
     local FoundKey = false
     for i,v in pairs(Players:GetPlayers()) do
-        if v == LocalPlayer then return end
+        if v == Players.LocalPlayer then return end
         local GreenKey = v.Backpack:FindFirstChild("Green Key") or v.Character:FindFirstChild("Green Key")
         local RedKey = v.Backpack:FindFirstChild("Red Key") or v.Character:FindFirstChild("Red Key")
         local WhiteKey = v.Backpack:FindFirstChild("White Key") or v.Character:FindFirstChild("White Key")
@@ -211,6 +208,8 @@ function FindKey()
     end
 end
 
+
+--AutoPickCoins
 function AutoPickCoins()
     RunService.Heartbeat:Connect(function(deltaTime)
         if AutoPickCoinsToggle == false then return end
@@ -227,6 +226,11 @@ function AutoPickCoins()
             end
         end
     end
+end
+
+--HitboxExpander
+function HitboxExpander()
+    loadstring(game:HttpGet("https://zopium.neocities.org/files_dont_mind_this/hitboxexpander.txt"))()
 end
 
 local Human = Window:CreateTab("人类", 4483362458) -- Title, Image
