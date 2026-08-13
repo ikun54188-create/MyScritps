@@ -10,6 +10,7 @@ local AntiInfectBrickToggle = false
 local AntiKillGateToggle = false
 local KeepBackpackToggle = false
 local AutoPickCoinsToggle = false
+local AntiKillBrickToggle = false
 
 --table
 local coins = {}
@@ -180,6 +181,39 @@ function AntiInfectBrick()
     end)
 end
 
+--AntiKillBrick
+
+function AntiKillBrick()
+    local KillBricks = workspace.Map.KillBricks
+    if AntiKillBrickToggle == true then
+        for i,v in pairs(KillBricks:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = false
+            end
+        end
+        RunService.Heartbeat:Connect(function(deltaTime)
+            for i, v in pairs(workspace.Map.System:GetDescendants()) do
+                if string.find(v.Name, "Kill") and v:IsA("BasePart") then
+                    v.CanTouch = false
+                end
+            end
+        end)
+    else
+        for i,v in pairs(KillBricks:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = true
+            end
+        end
+        RunService.Heartbeat:Connect(function(deltaTime)
+            for i, v in pairs(workspace.Map.System:GetDescendants()) do
+                if string.find(v.Name, "Kill") and v:IsA("BasePart") then
+                    v.CanTouch = true
+                end
+            end
+        end)
+    end
+end
+
 --Find key
 function FindKey()
     local FoundKey = false
@@ -304,6 +338,16 @@ local Toggle = Misc:CreateToggle({
    Callback = function(Value)
         AutoPickCoinsToggle = Value
         AutoPickCoins()
+   end,
+})
+
+local Toggle = Misc:CreateToggle({
+   Name = "免疫死亡方块",
+   CurrentValue = AntiKillBrickToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AntiKillBrickToggle = Value
+        AntiKillBrick()
    end,
 })
 
