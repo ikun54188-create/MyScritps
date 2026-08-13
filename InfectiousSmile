@@ -1,0 +1,311 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+--Toggles
+local InfectAuraToggle = false
+local SwingAuraToggle = false
+local AntiSpearToggle = false
+local AntiInfectBrickToggle = false
+local AntiKillGateToggle = false
+local KeepBackpackToggle = false
+local AutoPickCoinsToggle = false
+
+--table
+local coins = {}
+
+--Disabled Antihack bricks
+local AntiHackFolder = workspace.Map:FindFirstChild("AntiHack")
+if AntiHackFolder then
+    AntiHackFolder:Destroy()
+end
+
+--Loading UI library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Infectious Smile",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Script Loading",
+   LoadingSubtitle = "by kanbodadiaoba",
+   ShowText = "XD", -- for mobile users to unhide Rayfield, change if you'd like
+   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false, -- Prevents Rayfield from emitting warnings when the script has a version mismatch with the interface.
+
+   -- ScriptID = "sid_xxxxxxxxxxxx", -- Your Script ID from developer.sirius.menu — enables analytics, managed keys, and script hosting
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include Discord.gg/. E.g. Discord.gg/ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the Discord every time they load it up
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+      FileName = "Key", -- It is recommended to use something unique, as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = {"Hello"} -- List of keys that the system will accept, can be RAW file links (pastebin, github, etc.) or simple strings ("hello", "key22")
+   }
+})
+
+--Infect Aura
+
+function InfectAura()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if InfectAuraToggle == false then return end
+        local Infected = game:GetService("Players").LocalPlayer.Character:FindFirstChild("Infected")
+
+        if Infected then
+            local InfectEvent = game:GetService("Players").LocalPlayer.Character.Infected.InfectEvent
+            InfectEvent:FireServer("S")
+        else
+            print("Player isnt Smiler")
+        end
+    end)
+end
+
+--Swing Aura
+function SwingAura()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if SwingAuraToggle == false then return end
+        local Weapon = Character:FindFirstChildOfClass("Tool")
+
+        if not Weapon then return end
+        local SwingEvent = Weapon.SwingEvent
+        SwingEvent:FireServer()
+    end)
+end
+
+--AntiSpear
+function AntiSpear()
+    local MainSpear = workspace.Map.Misc:WaitForChild("Spearer")
+    if AntiSpearToggle == true then
+        for _,v in pairs(MainSpear:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = false         
+            end
+        end
+    else
+        for _,v in pairs(MainSpear:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = true         
+            end
+        end
+    end
+end
+
+--AntiKillGate
+function AntiKillGate()
+    local KillGate = workspace.Map.ConstantTerrain:WaitForChild("KillGateSwitcher")
+    if AntiKillGateToggle == true then
+        for _, v in pairs(KillGate:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = false
+            end
+        end
+    else
+        for _, v in pairs(KillGate:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = true
+            end
+        end
+    end
+end
+
+--KeepBackpack
+function KeepBackpack()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if KeepBackpackToggle == false then return end
+        game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
+    end)
+end
+
+--AntiInfectBrick
+function AntiInfectBrick()
+    local InfectorFolder = workspace.Map:WaitForChild("Infectors")
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if AntiInfectBrickToggle == true then
+            for _,v in pairs(InfectorFolder:GetDescendants()) do
+                if string.find(v.Name, "Infector") then
+                    for _,Infector in pairs(v:GetDescendants()) do
+                        if Infector:IsA("BasePart") then
+                            Infector.CanTouch = false
+                        end
+                    end
+                end
+            end
+            for _,v in pairs(workspace.Map:GetDescendants()) do
+                if string.find(v.Name, "Infector") then
+                    for _,Infector in pairs(v:GetDescendants()) do
+                        if Infector:IsA("BasePart") then
+                            Infector.CanTouch = false
+                        end
+                    end
+                end
+            end
+        else
+            for _,v in pairs(InfectorFolder:GetDescendants()) do
+                if string.find(v.Name, "Infector") then
+                    for _,Infector in pairs(v:GetDescendants()) do
+                        if Infector:IsA("BasePart") then
+                            Infector.CanTouch = true
+                        end
+                    end
+                end
+            end
+            for _,v in pairs(workspace.Map:GetDescendants()) do
+                if string.find(v.Name, "Infector") then
+                    for _,Infector in pairs(v:GetDescendants()) do
+                        if Infector:IsA("BasePart") then
+                            Infector.CanTouch = false
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
+--Find key
+function FindKey()
+    local FoundKey = false
+    for i,v in pairs(Players:GetPlayers()) do
+        if v == LocalPlayer then return end
+        local GreenKey = v.Backpack:FindFirstChild("Green Key") or v.Character:FindFirstChild("Green Key")
+        local RedKey = v.Backpack:FindFirstChild("Red Key") or v.Character:FindFirstChild("Red Key")
+        local WhiteKey = v.Backpack:FindFirstChild("White Key") or v.Character:FindFirstChild("White Key")
+        if GreenKey or RedKey or WhiteKey then
+            local Key = GreenKey or RedKey or WhiteKey
+            FoundKey = true
+            Rayfield:Notify({
+                Title = "Found a "..Key.Name,
+                Content = v.Name.."Has Key",
+                Duration = 6.5,
+                Image = Players:GetUserThumbnailAsync(v.UserId),
+            })
+        else
+            Rayfield:Notify({
+                Title = "Not found key",
+                Content = "No one has key",
+                Duration = 6.5,
+                Image = 4483362458,
+            })
+        end
+    end
+end
+
+function AutoPickCoins()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if AutoPickCoinsToggle == false then return end
+        for i, v in pairs(coins) do
+            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v, false)
+            table.remove(coins, i)
+        end
+    end)
+
+    while wait(1) do
+        for i, v in pairs(workspace:GetDescendants()) do
+            if v.Name == "SmileCoin" then
+                table.insert(coins, v)
+            end
+        end
+    end
+end
+
+local Human = Window:CreateTab("人类", 4483362458) -- Title, Image
+local Infectious = Window:CreateTab("微笑", 4483362458) -- Title, Image
+local Misc = Window:CreateTab("杂项", 4483362458)
+
+local Toggle = Human:CreateToggle({
+   Name = "挥动光环",
+   CurrentValue = SwingAuraToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        SwingAuraToggle = Value
+        SwingAura()
+   end,
+})
+
+local Toggle = Human:CreateToggle({
+   Name = "免疫白色方块",
+   CurrentValue = AntiInfectBrickToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AntiInfectBrickToggle = Value
+        AntiInfectBrick()
+   end,
+})
+
+local Toggle = Infectious:CreateToggle({
+   Name = "感染光环",
+   CurrentValue = InfectAuraToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        InfectAuraToggle = Value
+        InfectAura()
+   end,
+})
+
+local Toggle = Infectious:CreateToggle({
+   Name = "免疫熔岩矛",
+   CurrentValue = AntiSpearToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AntiSpearToggle = Value
+        AntiSpear()
+   end,
+})
+
+local Toggle = Infectious:CreateToggle({
+   Name = "免疫基地能量门",
+   CurrentValue = AntiKillGateToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AntiKillGateToggle = Value
+        AntiKillGate()
+   end,
+})
+
+local Toggle = Misc:CreateToggle({
+   Name = "保持物品栏",
+   CurrentValue = KeepBackpackToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        KeepBackpackToggle = Value
+        KeepBackpack()
+   end,
+})
+
+local Toggle = Misc:CreateToggle({
+   Name = "自动拾取金币",
+   CurrentValue = AutoPickCoinsToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AutoPickCoinsToggle = Value
+        AutoPickCoins()
+   end,
+})
+
+local Button = Misc:CreateButton({
+   Name = "查找钥匙",
+   Callback = function()
+        FindKey()
+   end,
+})
