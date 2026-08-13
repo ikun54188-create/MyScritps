@@ -15,6 +15,9 @@ local AntiKillBrickToggle = false
 --table
 local coins = {}
 
+--Varibles
+local HitboxSize = 10
+
 --Disabled Antihack bricks
 local AntiHackFolder = workspace.Map:FindFirstChild("AntiHack")
 if AntiHackFolder then
@@ -264,7 +267,15 @@ end
 
 --HitboxExpander
 function HitboxExpander()
-    loadstring(game:HttpGet("https://zopium.neocities.org/files_dont_mind_this/hitboxexpander.txt"))()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        for i, v in pairs(Players:GetPlayers()) do
+            if v ~= Players.LocalPlayer then
+            local Root = v.Character.HumanoidRootPart
+            Root.Size = Vector3.new(HitboxSize,HitboxSize,HitboxSize)
+            Root.Transparency = 0.8
+            end
+        end
+    end)
 end
 
 local Human = Window:CreateTab("人类", 4483362458) -- Title, Image
@@ -355,5 +366,17 @@ local Button = Misc:CreateButton({
    Name = "查找钥匙",
    Callback = function()
         FindKey()
+   end,
+})
+
+local Input = Human:CreateInput({
+   Name = "碰撞箱扩大",
+   CurrentValue = "10",
+   PlaceholderText = "Input Placeholder",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text)
+        HitboxSize = Text
+        HitboxExpander()
    end,
 })
