@@ -11,6 +11,7 @@ local AntiKillGateToggle = false
 local KeepBackpackToggle = false
 local AutoPickCoinsToggle = false
 local AntiKillBrickToggle = false
+local AntiDisasterToggle = false
 
 --table
 local coins = {}
@@ -54,15 +55,15 @@ local Window = Rayfield:CreateWindow({
       RememberJoins = true -- Set this to false to make them join the Discord every time they load it up
    },
 
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
-      Title = "Untitled",
+      Title = "你喜不喜欢炉管",
       Subtitle = "Key System",
       Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
       FileName = "Key", -- It is recommended to use something unique, as other scripts using Rayfield may overwrite your key file
       SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Hello"} -- List of keys that the system will accept, can be RAW file links (pastebin, github, etc.) or simple strings ("hello", "key22")
+      Key = {"喜欢"} -- List of keys that the system will accept, can be RAW file links (pastebin, github, etc.) or simple strings ("hello", "key22")
    }
 })
 
@@ -70,7 +71,7 @@ local Window = Rayfield:CreateWindow({
 
 function InfectAura()
     RunService.Heartbeat:Connect(function(deltaTime)
-        if InfectAuraToggle == false then return end
+        if InfectAuraToggle == false then  return end
         local Infected = game:GetService("Players").LocalPlayer.Character:FindFirstChild("Infected")
 
         if Infected then
@@ -175,7 +176,7 @@ function AntiInfectBrick()
                 if string.find(v.Name, "Infector") then
                     for _,Infector in pairs(v:GetDescendants()) do
                         if Infector:IsA("BasePart") then
-                            Infector.CanTouch = false
+                            Infector.CanTouch = true
                         end
                     end
                 end
@@ -221,26 +222,20 @@ end
 function FindKey()
     local FoundKey = false
     for i,v in pairs(Players:GetPlayers()) do
-        if v == Players.LocalPlayer then return end
-        local GreenKey = v.Backpack:FindFirstChild("Green Key") or v.Character:FindFirstChild("Green Key")
-        local RedKey = v.Backpack:FindFirstChild("Red Key") or v.Character:FindFirstChild("Red Key")
-        local WhiteKey = v.Backpack:FindFirstChild("White Key") or v.Character:FindFirstChild("White Key")
-        if GreenKey or RedKey or WhiteKey then
-            local Key = GreenKey or RedKey or WhiteKey
-            FoundKey = true
-            Rayfield:Notify({
-                Title = "Found a "..Key.Name,
-                Content = v.Name.."Has Key",
-                Duration = 6.5,
-                Image = Players:GetUserThumbnailAsync(v.UserId),
-            })
-        else
-            Rayfield:Notify({
-                Title = "Not found key",
-                Content = "No one has key",
-                Duration = 6.5,
-                Image = 4483362458,
-            })
+        if v ~= Players.LocalPlayer then
+            local GreenKey = v.Backpack:FindFirstChild("Green Key") or v.Character:FindFirstChild("Green Key")
+            local RedKey = v.Backpack:FindFirstChild("Red Key") or v.Character:FindFirstChild("Red Key")
+            local WhiteKey = v.Backpack:FindFirstChild("White Key") or v.Character:FindFirstChild("White Key")
+            if GreenKey or RedKey or WhiteKey then
+                local Key = GreenKey or RedKey or WhiteKey
+                FoundKey = true
+                Rayfield:Notify({
+                    Title = "Found a "..Key.Name,
+                    Content = v.Name.."Has Key",
+                    Duration = 6.5,
+                    Image = Players:GetUserThumbnailAsync(v.UserId),
+                })
+            end
         end
     end
 end
@@ -273,6 +268,39 @@ function HitboxExpander()
             local Root = v.Character.HumanoidRootPart
             Root.Size = Vector3.new(HitboxSize,HitboxSize,HitboxSize)
             Root.Transparency = 0.8
+            end
+        end
+    end)
+end
+
+--GetWeapon
+function GetWeapon()
+    local WeaponCollection = workspace.Map.HumanBase:WaitForChild("Vendor")
+    for i, v in pairs(WeaponCollection:GetDescendants()) do
+        if v:IsA("ClickDetector") then
+            fireclickdetector(v, 1)
+        end
+    end
+end
+
+--AntiDisaster
+function AntiDisaster()
+    RunService.Heartbeat:Connect(function(deltaTime)
+        if AntiDisasterToggle == true then
+            local CurrentDisaster = workspace.Map.System:FindFirstChild("Weight") or workspace.Map.System:FindFirstChild("Lava") or workspace.Map.System:FindFirstChild("Water")
+            if not CurrentDisaster then return end
+            for i, v in pairs(CurrentDisaster:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanTouch = false
+                end
+            end
+        else
+            local CurrentDisaster = workspace.Map.System:FindFirstChild("Weight") or workspace.Map.System:FindFirstChild("Lava") or workspace.Map.System:FindFirstChild("Water")
+            if not CurrentDisaster then return end
+            for i, v in pairs(CurrentDisaster:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanTouch = true
+                end
             end
         end
     end)
@@ -362,10 +390,27 @@ local Toggle = Misc:CreateToggle({
    end,
 })
 
+local Toggle = Misc:CreateToggle({
+   Name = "免疫灾难",
+   CurrentValue = AntiDisasterToggle,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+        AntiDisasterToggle = Value
+        AntiDisaster()
+   end,
+})
+
 local Button = Misc:CreateButton({
    Name = "查找钥匙",
    Callback = function()
         FindKey()
+   end,
+})
+
+local Button = Human:CreateButton({
+   Name = "获得武器",
+   Callback = function()
+        GetWeapon()
    end,
 })
 
