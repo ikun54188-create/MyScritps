@@ -267,20 +267,10 @@ function HitboxExpander()
             if v ~= Players.LocalPlayer then
             local Root = v.Character.HumanoidRootPart
             Root.Size = Vector3.new(HitboxSize,HitboxSize,HitboxSize)
-            Root.Transparency = 0.8
+            Root.Transparency = 0.95
             end
         end
     end)
-end
-
---GetWeapon
-function GetWeapon()
-    local WeaponCollection = workspace.Map.HumanBase:WaitForChild("Vendor")
-    for i, v in pairs(WeaponCollection:GetDescendants()) do
-        if v:IsA("ClickDetector") then
-            fireclickdetector(v, 1)
-        end
-    end
 end
 
 --AntiDisaster
